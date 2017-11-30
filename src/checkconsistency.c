@@ -39,7 +39,7 @@
  * at both endpoints)                                                         *
  * -------------------------------------------------------------------------- */
 
-int vofi_check_side_consistency(integrand impl_func,vofi_creal fe[],vofi_creal x0[],
+int vofi_check_side_consistency(integrand impl_func,void *userdata,vofi_creal fe[],vofi_creal x0[],
 			        vofi_creal sidedir[],vofi_creal h0)
 {
   int i,f_iat, ftmp;
@@ -67,7 +67,7 @@ int vofi_check_side_consistency(integrand impl_func,vofi_creal fe[],vofi_creal x
     }
     for (i=0; i<NDIM; i++)
       xs[i] = x0[i] + dh*sidedir[i];
-    fs = f_iat*impl_func(xs);
+    fs = f_iat*impl_func(userdata,xs);
     ftmp = f_iat;
     if (fs >= ft)
       f_iat = 0;
@@ -76,7 +76,7 @@ int vofi_check_side_consistency(integrand impl_func,vofi_creal fe[],vofi_creal x
     if (!f_iat) { 
     for (i=0; i<NDIM; i++)
       xs[i] = x0[i] + 0.5*h0*sidedir[i];
-    fs = ftmp*impl_func(xs);
+    fs = ftmp*impl_func(userdata,xs);
     if (fs < ft)
       f_iat = ftmp; 
     }    
@@ -96,7 +96,7 @@ int vofi_check_side_consistency(integrand impl_func,vofi_creal fe[],vofi_creal x
  * f_iat in the previous function                                             *
  * -------------------------------------------------------------------------- */
 
-chk_data vofi_check_face_consistency(integrand impl_func,vofi_creal fv[],vofi_creal x0[],
+chk_data vofi_check_face_consistency(integrand impl_func,void *userdata,vofi_creal fv[],vofi_creal x0[],
 				     vofi_creal sdir[],vofi_creal tdir[],vofi_creal h0)
 {
   int i,iss,ist,iat;
@@ -150,13 +150,13 @@ chk_data vofi_check_face_consistency(integrand impl_func,vofi_creal fv[],vofi_cr
       xt[i] = x1[i] + dh0*ist*tdir[i];
     }
     
-    fs = ivga.iat*impl_func(xs);
+    fs = ivga.iat*impl_func(userdata,xs);
     if (fs < f0) {
       iat = ivga.iat;
       ivga.igs = 1;
     }
     
-    ft = ivga.iat*impl_func(xt);
+    ft = ivga.iat*impl_func(userdata,xt);
     if (ft < f0) {
       iat = ivga.iat;
       ivga.igt = 1;

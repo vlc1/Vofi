@@ -39,8 +39,9 @@
  * OUTPUT: area: normalized value of the cut area or 2D volume fraction       *
  * -------------------------------------------------------------------------- */
 
-double vofi_get_area(integrand impl_func,vofi_creal x0[],vofi_creal int_lim_intg[],vofi_creal 
-                     pdir[],vofi_creal sdir[],vofi_creal h0,vofi_cint nintsub,vofi_cint nintpt)
+double vofi_get_area(integrand impl_func,void *userdata,vofi_creal x0[],vofi_creal int_lim_intg[],
+                     vofi_creal pdir[],vofi_creal sdir[],vofi_creal h0,vofi_cint nintsub,vofi_cint
+                     nintpt)
 {
   int i,ns,k,npt,cut_rect;
   vofi_cint true_sign = 1;
@@ -64,8 +65,8 @@ double vofi_get_area(integrand impl_func,vofi_creal x0[],vofi_creal int_lim_intg
       x20[i] = x0[i] + sdir[i]*cs;
       x21[i] = x1[i] + sdir[i]*cs;
     }    
-    fe[0] = impl_func(x20);
-    fe[1] = impl_func(x21);
+    fe[0] = impl_func(userdata,x20);
+    fe[1] = impl_func(userdata,x21);
     if (fe[0]*fe[1] <= 0.)
       cut_rect = 1;        
     
@@ -119,10 +120,10 @@ double vofi_get_area(integrand impl_func,vofi_creal x0[],vofi_creal int_lim_intg
 	  x20[i] = x0[i] + sdir[i]*xis;
 	  x21[i] = x1[i] + sdir[i]*xis;
 	}
-	fe[0] = impl_func(x20);
-	fe[1] = impl_func(x21);
+	fe[0] = impl_func(userdata,x20);
+	fe[1] = impl_func(userdata,x21);
 	if (fe[0]*fe[1] < 0.)
-	  ht = vofi_get_segment_zero(impl_func,fe,x20,pdir,h0,true_sign);
+	  ht = vofi_get_segment_zero(impl_func,userdata,fe,x20,pdir,h0,true_sign);
 	else {                        /* weird situation with multiple zeroes */
 	  if (fe[0]+fe[1] < 0.)
 	    ht = h0;
@@ -159,7 +160,7 @@ double vofi_get_area(integrand impl_func,vofi_creal x0[],vofi_creal int_lim_intg
  * OUTPUT: vol: normalized value of the cut volume or 3D volume fraction      *
  * -------------------------------------------------------------------------- */
 
-double vofi_get_volume(integrand impl_func,vofi_creal x0[],vofi_creal ext_lim_intg[],
+double vofi_get_volume(integrand impl_func,void *userdata,vofi_creal x0[],vofi_creal ext_lim_intg[],
 		       vofi_creal pdir[],vofi_creal sdir[],vofi_creal tdir[],vofi_creal h0,
 		       vofi_cint nextsub,vofi_cint nintpt)
 {
@@ -182,21 +183,21 @@ double vofi_get_volume(integrand impl_func,vofi_creal x0[],vofi_creal ext_lim_in
       x1[i] = x0[i] + tdir[i]*cs;
       x2[i] = x1[i] + pdir[i]*h0;
     }
-    f1 = impl_func(x1);
-    f2 = impl_func(x2);
+    f1 = impl_func(userdata,x1);
+    f2 = impl_func(userdata,x2);
     if (f1*f2 <= 0.)
       cut_hexa = 1;                        
     if (!cut_hexa) {            /* check lower side along secondary direction */
       fe[0] = f1;
       for (i=0;i<NDIM;i++)  
 	x3[i] = x1[i] + sdir[i]*h0;
-      fe[1] = impl_func(x3);
+      fe[1] = impl_func(userdata,x3);
       if (fe[0]*fe[1] <= 0.)
 	cut_hexa = 1;        
       else {
-	f_iat = vofi_check_side_consistency(impl_func,fe,x1,sdir,h0); 
+	f_iat = vofi_check_side_consistency(impl_func,userdata,fe,x1,sdir,h0);
 	if (f_iat != 0) { 
-	  xfsa = vofi_get_segment_min(impl_func,fe,x1,sdir,h0,f_iat,max_iter);
+	  xfsa = vofi_get_segment_min(impl_func,userdata,fe,x1,sdir,h0,f_iat,max_iter);
 	  cut_hexa = xfsa.iat;        
 	}
       }
@@ -205,13 +206,13 @@ double vofi_get_volume(integrand impl_func,vofi_creal x0[],vofi_creal ext_lim_in
       fe[0] = f2;
       for (i=0;i<NDIM;i++)  
 	x3[i] = x2[i] + sdir[i]*h0;
-      fe[1] = impl_func(x3);
+      fe[1] = impl_func(userdata,x3);
       if (fe[0]*fe[1] <= 0.)
 	cut_hexa = 1;        
       else {
-	f_iat = vofi_check_side_consistency(impl_func,fe,x2,sdir,h0); 
+	f_iat = vofi_check_side_consistency(impl_func,userdata,fe,x2,sdir,h0);
 	if (f_iat != 0) {
-	  xfsa = vofi_get_segment_min(impl_func,fe,x2,sdir,h0,f_iat,max_iter);
+	  xfsa = vofi_get_segment_min(impl_func,userdata,fe,x2,sdir,h0,f_iat,max_iter);
 	  cut_hexa = xfsa.iat;        
 	}
       }
@@ -251,9 +252,9 @@ double vofi_get_volume(integrand impl_func,vofi_creal x0[],vofi_creal ext_lim_in
 	xis = cs + 0.5*ds*(*ptexx);
 	for (i=0;i<NDIM;i++) 
 	  x1[i] = x0[i] + tdir[i]*xis;
-	nintsub = vofi_get_limits(impl_func,x1,int_lim_intg,pdir,sdir,tdir,h0,
+	nintsub = vofi_get_limits(impl_func,userdata,x1,int_lim_intg,pdir,sdir,tdir,h0,
                                   stdir);
-	area_n = vofi_get_area(impl_func,x1,int_lim_intg,pdir,sdir,h0,nintsub,
+	area_n = vofi_get_area(impl_func,userdata,x1,int_lim_intg,pdir,sdir,h0,nintsub,
                                nintpt);
 	/* DEBUG 4 */
 

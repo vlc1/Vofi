@@ -43,8 +43,9 @@
  * (hence: 0/1)                                                               *
  * -------------------------------------------------------------------------- */
 
-dir_data vofi_get_dirs(integrand impl_func,vofi_creal x0[],vofi_real pdir[],vofi_real sdir[],
-	               vofi_real tdir[],vofi_creal h0,vofi_creal fh,vofi_cint ndim0)
+dir_data vofi_get_dirs(integrand impl_func,void *userdata,vofi_creal x0[],vofi_real pdir[],
+                       vofi_real sdir[],vofi_real tdir[],vofi_creal h0,vofi_creal fh,vofi_cint
+                       ndim0)
 {
   int i,j,k,m,n,np1,np0,nmax,kmax,jt,js,jp,npt_with_grad;
   int cpos[NDIM],cneg[NDIM];
@@ -81,7 +82,7 @@ dir_data vofi_get_dirs(integrand impl_func,vofi_creal x0[],vofi_real pdir[],vofi
 	x1[0] = x2[0] + i*hh;
 	x1[1] = x2[1] + j*hh;
 	x1[2] = x2[2] + k*hh;
-	f1 = impl_func(x1);
+	f1 = impl_func(userdata,x1);
 	f0[k][i][j] = f1;
 	if (fabs(f1) > fh) { 
 	  if (f1 < 0.)
@@ -121,7 +122,7 @@ dir_data vofi_get_dirs(integrand impl_func,vofi_creal x0[],vofi_real pdir[],vofi
 	    for (n=0;n<ndim0;n++) {
 	      xp[n] += dh;
 	      xm[n] -= dh;
-	      df0[k][i][j][n] = 0.5*(impl_func(xp) - impl_func(xm))/dh;
+	      df0[k][i][j][n] = 0.5*(impl_func(userdata,xp) - impl_func(userdata,xm))/dh;
 	      gradf_ave[n] += df0[k][i][j][n];  
 	      xp[n] = xm[n] = x1[n];
 	      if (df0[k][i][j][n] > 0.)

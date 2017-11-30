@@ -42,7 +42,7 @@
  * of a point with a different function sign                                  *
  * -------------------------------------------------------------------------- */
 
-min_data vofi_get_segment_min(integrand impl_func,vofi_creal fe[],vofi_creal x0[],
+min_data vofi_get_segment_min(integrand impl_func,void *userdata,vofi_creal fe[],vofi_creal x0[],
                               vofi_creal dir[],vofi_creal s0,vofi_cint f_sign,vofi_cint max_iter)
 {
   int i,j,iter,not_conv,igold,iseca;
@@ -79,7 +79,7 @@ min_data vofi_get_segment_min(integrand impl_func,vofi_creal fe[],vofi_creal x0[
   ss = sa + GRIS*(sb - sa);
   for (i=0; i<NDIM; i++)
     xs[i] = x0[i] + ss*dir[i];
-  fs = f_sign*impl_func(xs);
+  fs = f_sign*impl_func(userdata,xs);
   if (fs > ft) {
     SHFT4(fu,ft,fs,fu);
     SHFT4(su,st,ss,su);
@@ -159,7 +159,7 @@ min_data vofi_get_segment_min(integrand impl_func,vofi_creal fe[],vofi_creal x0[
       /* get new point and f value */
       for (i=0; i<NDIM; i++)
          xs[i] = x0[i] + su*dir[i];
-      fu = f_sign*impl_func(xs);
+      fu = f_sign*impl_func(userdata,xs);
       if (fu < 0.)                                    /* got the sign change! */
 	not_conv = 0;
 
@@ -224,7 +224,7 @@ min_data vofi_get_segment_min(integrand impl_func,vofi_creal fe[],vofi_creal x0[
 	  su = p/q;
           for (i=0; i<NDIM; i++)
             xs[i] = x0[i] + su*dir[i];
-          fu = f_sign*impl_func(xs);
+          fu = f_sign*impl_func(userdata,xs);
 	  /* DEBUG 10 */
 
 	  iseca = 0;
@@ -236,7 +236,7 @@ min_data vofi_get_segment_min(integrand impl_func,vofi_creal fe[],vofi_creal x0[
 	      sz = su +j*tol;
               for (i=0; i<3; i++)
                 xs[i] = x0[i] + sz*dir[i];
-              fz = f_sign*impl_func(xs);
+              fz = f_sign*impl_func(userdata,xs);
 	      if (fz > fu)
 	        iseca++;
 	    }
@@ -279,7 +279,7 @@ min_data vofi_get_segment_min(integrand impl_func,vofi_creal fe[],vofi_creal x0[
  * of a point with a different function sign                                  *
  * -------------------------------------------------------------------------- */
 
-min_data vofi_get_face_min(integrand impl_func,vofi_creal x0[],vofi_creal sdir[],
+min_data vofi_get_face_min(integrand impl_func,void *userdata,vofi_creal x0[],vofi_creal sdir[],
                            vofi_creal tdir[],chk_data ivga,vofi_creal h0)
 {
   int i,not_conv,iter,k,ipt,iss;
@@ -302,12 +302,12 @@ min_data vofi_get_face_min(integrand impl_func,vofi_creal x0[],vofi_creal sdir[]
     rs0[i] = 0.;
     hs0[i] = 1. - sdir[i] - tdir[i];
   }
-  fe[0] = impl_func(xs0);
-  fp0   = ivga.iat*impl_func(xs0);
-  fs1   = ivga.iat*impl_func(xs1);
-  fs2   = ivga.iat*impl_func(xs2);
-  ft1   = ivga.iat*impl_func(xt1);
-  ft2   = ivga.iat*impl_func(xt2);
+  fe[0] = impl_func(userdata,xs0);
+  fp0   = ivga.iat*impl_func(userdata,xs0);
+  fs1   = ivga.iat*impl_func(userdata,xs1);
+  fs2   = ivga.iat*impl_func(userdata,xs2);
+  ft1   = ivga.iat*impl_func(userdata,xt1);
+  ft2   = ivga.iat*impl_func(userdata,xt2);
     
   /* initial residue (-grad f) and diagonal hessian (in 2D) */
   dfs = -0.5*(fs2-fs1)/dh;
@@ -345,7 +345,7 @@ min_data vofi_get_face_min(integrand impl_func,vofi_creal x0[],vofi_creal sdir[]
   ss0 = MIN(ss0,ss[2]);
   for (i=0;i<NDIM;i++) 
     xs1[i] = xs0[i] + ss0*nmdr[i];
-  fe[1] = impl_func(xs1);
+  fe[1] = impl_func(userdata,xs1);
 
   delnew = del0;
   not_conv = 1;
@@ -353,7 +353,7 @@ min_data vofi_get_face_min(integrand impl_func,vofi_creal x0[],vofi_creal sdir[]
   while (not_conv  && iter < max_iter) {                    /* iterative loop */
     /* DEBUG 1 */
 
-    xfsa = vofi_get_segment_min(impl_func,fe,xs0,nmdr,ss0,ivga.iat,
+    xfsa = vofi_get_segment_min(impl_func,userdata,fe,xs0,nmdr,ss0,ivga.iat,
                                 max_iter_line); 
 
     for (i=0;i<NDIM;i++)                    
@@ -372,10 +372,10 @@ min_data vofi_get_face_min(integrand impl_func,vofi_creal x0[],vofi_creal sdir[]
       ss0 = xfsa.sval;
       /* DEBUG 2 */
 
-      fs1 = ivga.iat*impl_func(xs1);
-      fs2 = ivga.iat*impl_func(xs2);
-      ft1 = ivga.iat*impl_func(xt1);
-      ft2 = ivga.iat*impl_func(xt2);
+      fs1 = ivga.iat*impl_func(userdata,xs1);
+      fs2 = ivga.iat*impl_func(userdata,xs2);
+      ft1 = ivga.iat*impl_func(userdata,xt1);
+      ft2 = ivga.iat*impl_func(userdata,xt2);
       dfs = -0.5*(fs2-fs1)/dh;
       dft = -0.5*(ft2-ft1)/dh;
       d2fs = (fs1+fs2-2.*fp0)/(dh*dh);
@@ -427,7 +427,7 @@ min_data vofi_get_face_min(integrand impl_func,vofi_creal x0[],vofi_creal sdir[]
       else {
 	for (i=0;i<NDIM;i++) 
 	  xs1[i] = xs0[i] + ss0*nmdr[i];
-	fe[1] = impl_func(xs1);
+	fe[1] = impl_func(userdata,xs1);
 	iss = 0;                                       /* bracket the minimum */
 	while (ivga.iat*fe[1] < fp0 && iss < 3 && ss0 < ss1) {
 	  ss0 = MIN(3.*ss0,ss1);
@@ -435,7 +435,7 @@ min_data vofi_get_face_min(integrand impl_func,vofi_creal x0[],vofi_creal sdir[]
 	    ss0 = ss1;
 	  for (i=0;i<NDIM;i++) 
 	    xs1[i] = xs0[i] + ss0*nmdr[i];
-	  fe[1] = impl_func(xs1);
+	  fe[1] = impl_func(userdata,xs1);
 	  iss++;
 	}
       }

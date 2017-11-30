@@ -52,7 +52,7 @@ PROGRAM ELLIPSE
 
   ! starting point to get fh
   xv(1) = 0.5D0; xv(2) = 0.5D0; xv(3) = 0.0D0;
-  fh = VOFI_GET_FH(IMPL_FUNC,xv,h0,ndim0,itrue)
+  fh = VOFI_GET_FH(IMPL_FUNC,C_NULL_PTR,xv,h0,ndim0,itrue)
 
   ! put now starting point in (X0,Y0,0.) to initialize the color function 
   xv(1) = X0; xv(2) = Y0;
@@ -64,7 +64,7 @@ PROGRAM ELLIPSE
       xloc(1) = xv(1) + (i-1.D0)*h0
       xloc(2) = xv(2) + (j-1.D0)*h0
 
-      cc(i,j) = VOFI_GET_CC(IMPL_FUNC,xloc,h0,fh,ndim0)
+      cc(i,j) = VOFI_GET_CC(IMPL_FUNC,C_NULL_PTR,xloc,h0,fh,ndim0)
     END DO
   END DO 
 

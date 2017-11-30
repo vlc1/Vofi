@@ -27,9 +27,13 @@
 !* (local) axes: x',y',z'                                                     *
 !* -------------------------------------------------------------------------- *
 
-REAL(8) FUNCTION IMPL_FUNC (xyz)
+REAL(8) FUNCTION IMPL_FUNC(userdata, xyz)
+
+  USE, INTRINSIC :: ISO_C_BINDING
 
   IMPLICIT NONE
+
+  TYPE(C_PTR) :: userdata
   REAL(8), DIMENSION(3), INTENT(IN) :: xyz
 
   REAL(8), PARAMETER ::  MYPI = 3.141592653589793238462643D0

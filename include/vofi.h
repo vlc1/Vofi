@@ -46,7 +46,7 @@
 typedef const double  vofi_creal;
 typedef double  vofi_real;
 typedef const int  vofi_cint;
-typedef double (*integrand) ( vofi_creal []);
+typedef double (*integrand) (void *,vofi_creal []);
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,7 +64,7 @@ extern "C" {
  * @param fh "characteristic" function value
  * @note C/C++ API
  */
-vofi_real vofi_Get_fh(integrand,vofi_creal [],vofi_creal,vofi_cint,vofi_cint); 
+vofi_real vofi_Get_fh(integrand,void *,vofi_creal [],vofi_creal,vofi_cint,vofi_cint);
 
 /**
  * @brief Driver to compute the volume fraction value in a given cell in two 
@@ -77,7 +77,7 @@ vofi_real vofi_Get_fh(integrand,vofi_creal [],vofi_creal,vofi_cint,vofi_cint);
  * @param cc volume fraction value
  * @note C/C++ API
  */
-vofi_real vofi_Get_cc(integrand,vofi_creal [],vofi_creal,vofi_creal,vofi_cint);
+vofi_real vofi_Get_cc(integrand,void *,vofi_creal [],vofi_creal,vofi_creal,vofi_cint);
 
 #ifdef __cplusplus
 }

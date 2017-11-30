@@ -26,7 +26,7 @@
 #define N2D   2
 
 extern void check_area(vofi_creal, vofi_cint randominput);
-extern vofi_real impl_func(vofi_creal []);
+extern vofi_real impl_func(void *,vofi_creal []);
 extern void init(vofi_cint randominput);
 
 //* -------------------------------------------------------------------------- *
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
   init(randominput);
   
   //* get the characteristic value fh of the implicit function *
-  fh = vofi_Get_fh(impl_func,x0,h0,ndim0,itrue);
+  fh = vofi_Get_fh(impl_func,NULL,x0,h0,ndim0,itrue);
 
   //* put now starting point in (X0,Y0) to initialize the color function *
   x0[0] = X0; 
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
       xloc[0] = x0[0] + i*h0;
       xloc[1] = x0[1] + j*h0;
       
-      cc[i][j] = vofi_Get_cc(impl_func,xloc,h0,fh,ndim0);
+      cc[i][j] = vofi_Get_cc(impl_func,NULL,xloc,h0,fh,ndim0);
    }
 
   //* final global check *

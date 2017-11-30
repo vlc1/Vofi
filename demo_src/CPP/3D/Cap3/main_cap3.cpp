@@ -29,7 +29,7 @@
 FILE *fp;
 
 extern void check_volume(vofi_creal);
-extern vofi_real impl_func(vofi_creal []);
+extern vofi_real impl_func(void *,vofi_creal []);
 extern int cont_line(vofi_real *,vofi_real *,vofi_cint);
 
 //* ------------------------------------------------------------------- *
@@ -56,7 +56,7 @@ int main()
   x0[2] = 0.5; 
 
   //* get the characteristic value fh of the implicit function *
-  fh = vofi_Get_fh(impl_func,x0,h0,ndim0,itrue);
+  fh = vofi_Get_fh(impl_func,NULL,x0,h0,ndim0,itrue);
  
   //* put now starting point in (X0,Y0,Z0) to initialize the color function *
   x0[0] = X0; 
@@ -71,7 +71,7 @@ int main()
       xloc[1] = x0[1] + j*h0;
       xloc[2] = x0[2] + k*h0;
       
-      cc[i][j][k] = vofi_Get_cc(impl_func,xloc,h0,fh,ndim0);
+      cc[i][j][k] = vofi_Get_cc(impl_func,NULL,xloc,h0,fh,ndim0);
    }
 
   //* final global check *

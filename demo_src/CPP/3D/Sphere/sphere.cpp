@@ -39,7 +39,7 @@ using namespace std;
 //* (local) axes: x',y',z'                                                     *
 //* -------------------------------------------------------------------------- *
 
-real impl_func(creal xy[])
+real impl_func(void *userdata,creal xy[])
 {
   double x,y,z,A2,B2,C2,ca,sa,c1,c2,c3,c4,c5,c6,f0;
 

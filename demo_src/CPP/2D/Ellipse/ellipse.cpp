@@ -76,7 +76,7 @@ void init(cint randominput)
 
 /* -------------------------------------------------------------------------- */
 
-real impl_func(creal xy[]) 
+real impl_func(void *userdata,creal xy[])
 {
   real x,y,a2,b2,ca,sa,c1,c2,c3,c4,c5,c6,f0;
 

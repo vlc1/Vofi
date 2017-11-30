@@ -74,7 +74,7 @@ typedef double vofi_real;
 typedef const double vofi_creal;
 typedef const int vofi_cint;
 typedef int * const vofi_int_cpt;
-typedef double (*integrand) (vofi_creal []);
+typedef double (*integrand) (void *,vofi_creal []);
 
 /* xval: coordinates of the minimum or where the sign has changed, fval: local
    function value, sval: distance from the starting point, if applicable,
@@ -116,7 +116,7 @@ typedef struct {
  * @return fh "characteristic" function value
  * @note Fortran API
  */
-vofi_real EXPORT(vofi_get_fh)(integrand,vofi_creal [],vofi_creal *,vofi_cint *,vofi_cint *); 
+vofi_real EXPORT(vofi_get_fh)(integrand,void *,vofi_creal [],vofi_creal *,vofi_cint *,vofi_cint *);
 
 
 /**
@@ -130,7 +130,7 @@ vofi_real EXPORT(vofi_get_fh)(integrand,vofi_creal [],vofi_creal *,vofi_cint *,v
  * @return cc volume fraction value
  * @note Fortran API
  */
-vofi_real EXPORT(vofi_get_cc)(integrand,vofi_creal [],vofi_creal *,vofi_creal *,vofi_cint *);
+vofi_real EXPORT(vofi_get_cc)(integrand,void *,vofi_creal [],vofi_creal *,vofi_creal *,vofi_cint *);
 
 
 /**
@@ -144,7 +144,7 @@ vofi_real EXPORT(vofi_get_cc)(integrand,vofi_creal [],vofi_creal *,vofi_creal *,
  * @param f_sign sign attribute
  * @return sz: length of the segment where f is negative     
  */
-vofi_real vofi_get_segment_zero(integrand,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,vofi_cint); 
+vofi_real vofi_get_segment_zero(integrand,void *,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,vofi_cint);
 
 
 /**
@@ -159,7 +159,7 @@ vofi_real vofi_get_segment_zero(integrand,vofi_creal [],vofi_creal [],vofi_creal
  * with a minimum inside, or zero if there is no minimum inside (or a zero 
  * at both endpoints)
  */
-int vofi_check_side_consistency(integrand,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal);
+int vofi_check_side_consistency(integrand,void *,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal);
 
 /* -------------------------------------------------------------------------- *
  * DESCRIPTION:                                                               *
@@ -186,7 +186,7 @@ int vofi_check_side_consistency(integrand,vofi_creal [],vofi_creal [],vofi_creal
  * with a minimum inside, or zero if there is no minimum inside (or a zero
  * at both endpoints) 
  */
-chk_data vofi_check_face_consistency(integrand,vofi_creal [],vofi_creal [],vofi_creal [],
+chk_data vofi_check_face_consistency(integrand,void *,vofi_creal [],vofi_creal [],vofi_creal [],
                                 vofi_creal [],vofi_creal);
 
 
@@ -204,7 +204,7 @@ chk_data vofi_check_face_consistency(integrand,vofi_creal [],vofi_creal [],vofi_
  * of integration points; isb: number of subdivisions, not yet implemented
  * (hence: 0/1) 
  */
-dir_data vofi_get_dirs(integrand,vofi_creal [],vofi_real [],vofi_real [],vofi_real [],vofi_creal,vofi_creal,vofi_cint);
+dir_data vofi_get_dirs(integrand,void *,vofi_creal [],vofi_real [],vofi_real [],vofi_real [],vofi_creal,vofi_creal,vofi_cint);
 
 
 /**
@@ -221,7 +221,7 @@ dir_data vofi_get_dirs(integrand,vofi_creal [],vofi_real [],vofi_real [],vofi_re
  * @param ndim0 space dimension
  * @return nsub: total number of subdivisions
  */
-int vofi_get_limits(integrand,vofi_creal [],vofi_real [],vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,vofi_cint);
+int vofi_get_limits(integrand,void *,vofi_creal [],vofi_real [],vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,vofi_cint);
 
 
 /**
@@ -235,7 +235,7 @@ int vofi_get_limits(integrand,vofi_creal [],vofi_real [],vofi_creal [],vofi_crea
  * @param nsub updated number of subdivisions
  * @param lim_intg updated start of new subdivisions
  */
-void vofi_get_side_intersections(integrand,vofi_real [],vofi_creal [],vofi_real [],vofi_creal [],
+void vofi_get_side_intersections(integrand,void *,vofi_real [],vofi_creal [],vofi_real [],vofi_creal [],
 			    vofi_creal,vofi_int_cpt);
 
 
@@ -251,7 +251,7 @@ void vofi_get_side_intersections(integrand,vofi_real [],vofi_creal [],vofi_real 
  * @param nsub updated number of subdivisions
  * @param lim_intg updated start of new subdivisions
  */
-void vofi_get_face_intersections(integrand,min_data,vofi_creal [],vofi_real [],vofi_creal [],
+void vofi_get_face_intersections(integrand,void *,min_data,vofi_creal [],vofi_real [],vofi_creal [],
 			   vofi_creal [],vofi_creal,vofi_int_cpt);
 
 
@@ -269,7 +269,7 @@ void vofi_get_face_intersections(integrand,min_data,vofi_creal [],vofi_real [],v
  * and attribute (= 1 if a sign change has been detected) of the minimum or
  * of a point with a different function sign
  */
-min_data vofi_get_segment_min(integrand,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,vofi_cint,vofi_cint);
+min_data vofi_get_segment_min(integrand,void *,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,vofi_cint,vofi_cint);
 
 
 /**
@@ -285,7 +285,7 @@ min_data vofi_get_segment_min(integrand,vofi_creal [],vofi_creal [],vofi_creal [
  * and attribute (= 1 if a sign change has been detected) of the minimum or
  * of a point with a different function sign  
  */
-min_data vofi_get_face_min(integrand,vofi_creal [],vofi_creal [],vofi_creal [],chk_data,vofi_creal);
+min_data vofi_get_face_min(integrand,void *,vofi_creal [],vofi_creal [],vofi_creal [],chk_data,vofi_creal);
 
 
 /**
@@ -301,7 +301,7 @@ min_data vofi_get_face_min(integrand,vofi_creal [],vofi_creal [],vofi_creal [],c
  * @param nintpt tentative number of internal integration points 
  * @return area: normalized value of the cut area or 2D volume fraction
  */
-vofi_real vofi_get_area(integrand,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,vofi_cint,vofi_cint);
+vofi_real vofi_get_area(integrand,void *,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,vofi_cint,vofi_cint);
 
 
 /**
@@ -317,7 +317,7 @@ vofi_real vofi_get_area(integrand,vofi_creal [],vofi_creal [],vofi_creal [],vofi
  * @param nintpt tentative number of internal integration points
  * @return vol: normalized value of the cut volume or 3D volume fraction
  */
-vofi_real vofi_get_volume(integrand,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,
+vofi_real vofi_get_volume(integrand,void *,vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal [],vofi_creal,
 		  vofi_cint,vofi_cint);
 
 #endif

@@ -38,7 +38,7 @@
  * OUTPUT: fh ("characteristic" function value)                               *
  * -------------------------------------------------------------------------- */
 
-vofi_real vofi_Get_fh(integrand impl_func,vofi_creal x0[],vofi_creal h0,vofi_cint ndim0,vofi_cint ix0) 
+vofi_real vofi_Get_fh(integrand impl_func,void *userdata,vofi_creal x0[],vofi_creal h0,vofi_cint ndim0,vofi_cint ix0)
 {
   int i,k,isw;
   vofi_cint kmax = 100;                             /* max number of iterations    */
@@ -70,11 +70,11 @@ vofi_real vofi_Get_fh(integrand impl_func,vofi_creal x0[],vofi_creal h0,vofi_cin
 	x2[i] = 0.5;
 
     k = 0;
-    f2 = impl_func(x2);                   /* its f value (should not be zero) */
+    f2 = impl_func(userdata,x2);                   /* its f value (should not be zero) */
     while (fabs(f2) < EPS_NOT0 && k < kmax ) {
       for (i=0;i<ndim0;i++)
 	x2[i] += dh;
-      f2 = impl_func(x2);
+      f2 = impl_func(userdata,x2);
       k++;
     }
     f1 = f2;
@@ -91,7 +91,7 @@ vofi_real vofi_Get_fh(integrand impl_func,vofi_creal x0[],vofi_creal h0,vofi_cin
       for (i=0;i<ndim0;i++) {
 	xn2[i] += dh;
 	xn1[i] -= dh;
-	der[i] = 0.5*(impl_func(xn2)-impl_func(xn1))/dh;
+	der[i] = 0.5*(impl_func(userdata,xn2)-impl_func(userdata,xn1))/dh;
 	xn2[i] = xn1[i] = x1[i];
       }
       /* DEBUG 1 */
@@ -108,7 +108,7 @@ vofi_real vofi_Get_fh(integrand impl_func,vofi_creal x0[],vofi_creal h0,vofi_cin
       delta = MAX(delta,gamma); 
       for (i=0;i<ndim0;i++) 
 	x2[i] = x1[i] + isw*delta*der[i];    
-      f2 = impl_func(x2);
+      f2 = impl_func(userdata,x2);
       k++;
     }
     /* DEBUG 2 */
@@ -120,7 +120,7 @@ vofi_real vofi_Get_fh(integrand impl_func,vofi_creal x0[],vofi_creal h0,vofi_cin
       fe[1] = f2;
       for (i=0;i<ndim0;i++) 
 	der[i] = (x2[i]-x1[i])/delta;	
-      dd = vofi_get_segment_zero(impl_func,fe,x1,der,delta,1);
+      dd = vofi_get_segment_zero(impl_func,userdata,fe,x1,der,delta,1);
       for (i=0;i<ndim0;i++) {
 	if (f1 <= f2) 
 	  x1[i] = x1[i] + dd*der[i];
@@ -133,21 +133,21 @@ vofi_real vofi_Get_fh(integrand impl_func,vofi_creal x0[],vofi_creal h0,vofi_cin
       for (i=0;i<ndim0;i++) {
 	xn2[i] += dh;
 	xn1[i] -= dh;
-	der[i] = 0.5*(impl_func(xn2)-impl_func(xn1))/dh;
+	der[i] = 0.5*(impl_func(userdata,xn2)-impl_func(userdata,xn1))/dh;
 	xn2[i] = xn1[i] = x1[i];
       }
       dd = sqrt(Sq3(der) + EPS_NOT0);
       if (dd < EPS_M) {
 	fprintf(stderr,"WARNING: the zero is almost a critical point:  \n");
 	fprintf(stderr,"(x,y,z): (%e, %e, %e) |f|,|grad(f)|: %e, %e \n",
-		x1[0],x1[1],x1[2],fabs(impl_func(x1)),dd);
+		x1[0],x1[1],x1[2],fabs(impl_func(userdata,x1)),dd);
       }
       for (i=0;i<ndim0;i++) {
 	xn1[i] = x1[i] + hb*der[i]/dd;
 	xn2[i] = x1[i] - hb*der[i]/dd;
       }
-      f1 = fabs(impl_func(xn1));
-      f2 = fabs(impl_func(xn2));
+      f1 = fabs(impl_func(userdata,xn1));
+      f2 = fabs(impl_func(userdata,xn2));
       fh = MAX(f1,f2);
     }
     else {                                          /* did not get f1*f2 < 0! */

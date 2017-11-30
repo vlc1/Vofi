@@ -24,6 +24,8 @@
 
 MODULE SINESURFACE_MOD
 
+  USE, INTRINSIC :: ISO_C_BINDING
+
   IMPLICIT NONE
 
   REAL(8), PARAMETER ::  MYPI = 3.141592653589793238462643D0
@@ -87,10 +89,12 @@ SUBROUTINE INIT(randominput)
 END SUBROUTINE INIT
 
 !* -------------------------------------------------------------------------- *
-  
-REAL(8) FUNCTION IMPL_FUNC (xyz)
+
+REAL(8) FUNCTION IMPL_FUNC(userdata, xyz)
 
   IMPLICIT NONE
+
+  TYPE(C_PTR) :: userdata
   REAL(8), DIMENSION(3), INTENT(IN) :: xyz
   REAL(8) :: x,y,z
 

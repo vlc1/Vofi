@@ -38,7 +38,7 @@
  * OUTPUT: sz: length of the segment where f is negative                      *
  * -------------------------------------------------------------------------- */
 
-vofi_real vofi_get_segment_zero(integrand impl_func,vofi_creal fe[],vofi_creal x0[],
+vofi_real vofi_get_segment_zero(integrand impl_func,void *userdata,vofi_creal fe[],vofi_creal x0[],
                            vofi_creal dir[],vofi_creal s0,vofi_cint f_sign)
 {
   int not_conv,iss,i,iter;
@@ -98,7 +98,7 @@ vofi_real vofi_get_segment_zero(integrand impl_func,vofi_creal fe[],vofi_creal x
       for (i=0; i<NDIM; i++)
         xs[i] = x0[i] + ss*dir[i];
       fold = fs;
-      fs = f_sign*impl_func(xs);
+      fs = f_sign*impl_func(userdata,xs);
       dfs = (fs-fold)/(ss-sold);
       if (fs < 0.0)
 	sl = ss;
